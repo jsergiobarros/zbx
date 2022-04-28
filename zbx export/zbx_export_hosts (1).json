@@ -1,0 +1,509 @@
+{
+    "zabbix_export": {
+        "version": "6.0",
+        "date": "2022-04-28T12:29:21Z",
+        "groups": [
+            {
+                "uuid": "748ad4d098d447d492bb935c907f652f",
+                "name": "Templates/Databases"
+            },
+            {
+                "uuid": "6f6799aa69e844b4b3918f779f2abf08",
+                "name": "Zabbix servers"
+            }
+        ],
+        "hosts": [
+            {
+                "host": "Banco",
+                "name": "Banco",
+                "description": "cevmbd01.tre-ce.gov.br",
+                "templates": [
+                    {
+                        "name": "TRE-CE Banco oracle"
+                    },
+                    {
+                        "name": "TRE-CE Banco oracle Agente"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "useip": "NO",
+                        "ip": "10.7.0.25",
+                        "dns": "cevmbd01.tre-ce.gov.br",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$DSN}",
+                        "value": "Banco"
+                    },
+                    {
+                        "macro": "{$ORACLE.DRIVER}",
+                        "value": "/usr/lib/oracle/21/client64/lib/libsqora.so.21.1"
+                    },
+                    {
+                        "macro": "{$ORACLE.PASSWORD}",
+                        "value": "j6vST+9bR8-ICdBr"
+                    },
+                    {
+                        "macro": "{$ORACLE.PORT}",
+                        "value": "1521"
+                    },
+                    {
+                        "macro": "{$ORACLE.SERVICE}",
+                        "value": "hmg"
+                    },
+                    {
+                        "macro": "{$ORACLE.USER}",
+                        "value": "zabbix_mon"
+                    },
+                    {
+                        "macro": "{$ORA_PASS}",
+                        "value": "j6vST+9bR8-ICdBr"
+                    },
+                    {
+                        "macro": "{$ORA_USER}",
+                        "value": "zabbix_mon"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "ce1",
+                "name": "ce1",
+                "templates": [
+                    {
+                        "name": "TRE-CE Banco oracle Agente"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "useip": "NO",
+                        "dns": "ce1.tre-ce.gov.br",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$DSN}",
+                        "value": "ce1"
+                    },
+                    {
+                        "macro": "{$ORACLE.SERVICE}",
+                        "value": "adm"
+                    },
+                    {
+                        "macro": "{$ORA_PASS}",
+                        "type": "SECRET_TEXT"
+                    },
+                    {
+                        "macro": "{$ORA_USER}",
+                        "value": "zabbix_mon"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "cevmbd02",
+                "name": "cevmbd02",
+                "templates": [
+                    {
+                        "name": "Linux by Zabbix agent"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "useip": "NO",
+                        "dns": "cevmbd02.tre-ce.gov.br",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "cevmbd06",
+                "name": "cevmbd06",
+                "templates": [
+                    {
+                        "name": "Linux by Zabbix agent"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "useip": "NO",
+                        "dns": "cevmbd06.tre-ce.gov.br",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "docker server",
+                "name": "docker server",
+                "templates": [
+                    {
+                        "name": "Docker by Zabbix agent 2"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "port": "10052",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$PG.PASSWORD}"
+                    },
+                    {
+                        "macro": "{$PG.USER}",
+                        "value": "zbx_monitor"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "oracle",
+                "name": "oracle",
+                "templates": [
+                    {
+                        "name": "TRE-CE Banco oracle"
+                    },
+                    {
+                        "name": "TRE-CE Banco oracle Agente"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "useip": "NO",
+                        "ip": "10.7.0.25",
+                        "dns": "cevmbd01.tre-ce.gov.br",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$DSN}",
+                        "value": "Oracle11g"
+                    },
+                    {
+                        "macro": "{$ORACLE.PORT}",
+                        "value": "1521"
+                    },
+                    {
+                        "macro": "{$ORACLE.SERVICE}"
+                    },
+                    {
+                        "macro": "{$ORA_PASS}",
+                        "value": "zabbix"
+                    },
+                    {
+                        "macro": "{$ORA_USER}",
+                        "value": "zabbix_mon"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "Postgresql agent",
+                "name": "Postgresql agent",
+                "templates": [
+                    {
+                        "name": "Linux by Zabbix agent"
+                    },
+                    {
+                        "name": "PostgreSQL by Zabbix agent"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "ip": "172.20.240.1",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "items": [
+                    {
+                        "name": "log",
+                        "type": "ZABBIX_ACTIVE",
+                        "key": "log[/var/log/zabbix/zabbix_agentd.log,,,,,,,,]",
+                        "trends": "0",
+                        "value_type": "LOG",
+                        "logtimefmt": "xxxx:yyyyMMdd:hhmmss"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "Postgresql server",
+                "name": "Postgresql server",
+                "templates": [
+                    {
+                        "name": "PostgreSQL by Zabbix agent 2"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates/Databases"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "port": "10052",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$PG.PASSWORD}",
+                        "type": "SECRET_TEXT"
+                    },
+                    {
+                        "macro": "{$PG.USER}",
+                        "value": "zbx_monitor"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            },
+            {
+                "host": "Zabbix server",
+                "name": "Zabbix server",
+                "templates": [
+                    {
+                        "name": "Linux by Zabbix agent"
+                    },
+                    {
+                        "name": "Zabbix server health"
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Zabbix servers"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "port": "10052",
+                        "interface_ref": "if1"
+                    }
+                ],
+                "items": [
+                    {
+                        "name": "Log",
+                        "type": "ZABBIX_ACTIVE",
+                        "key": "logrt[{$LOG_PATH}/2*,\"O job\" ]",
+                        "trends": "0",
+                        "value_type": "LOG"
+                    },
+                    {
+                        "name": "log",
+                        "type": "ZABBIX_ACTIVE",
+                        "key": "log[/var/log/zabbix/zabbix_agentd.log,,,,,,,,]",
+                        "trends": "0",
+                        "value_type": "LOG",
+                        "logtimefmt": "xxxxxx:yyyyMMdd:hhmmss"
+                    },
+                    {
+                        "name": "Postgres-server- 5432",
+                        "key": "net.tcp.service[http,172.20.240.1,5432]",
+                        "delay": "10m",
+                        "interface_ref": "if1",
+                        "tags": [
+                            {
+                                "tag": "check",
+                                "value": "1521"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,172.20.240.1,5432])=0",
+                                "name": "Postgres-server- 5432 off",
+                                "priority": "HIGH"
+                            },
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,172.20.240.1,5432])=1",
+                                "name": "Postgres-server- 5432 on",
+                                "priority": "INFO"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ce1 - 1521",
+                        "key": "net.tcp.service[http,ce1.tre-ce.gov.br,1521]",
+                        "delay": "10m",
+                        "interface_ref": "if1",
+                        "tags": [
+                            {
+                                "tag": "check",
+                                "value": "1521"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,ce1.tre-ce.gov.br,1521])=0",
+                                "name": "ce1 - 1521 off",
+                                "priority": "HIGH"
+                            },
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,ce1.tre-ce.gov.br,1521])=1",
+                                "name": "ce1 - 1521 on",
+                                "priority": "INFO"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "cevmbd01 - 1521",
+                        "key": "net.tcp.service[http,cevmbd01.tre-ce.gov.br,1521]",
+                        "delay": "10m",
+                        "interface_ref": "if1",
+                        "tags": [
+                            {
+                                "tag": "check",
+                                "value": "1521"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,cevmbd01.tre-ce.gov.br,1521])=0",
+                                "name": "cevmbd01 - 1521 off",
+                                "priority": "HIGH"
+                            },
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,cevmbd01.tre-ce.gov.br,1521])=1",
+                                "name": "cevmbd01 - 1521 on",
+                                "priority": "INFO"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "cevmbd02 - 1521",
+                        "key": "net.tcp.service[http,cevmbd02.tre-ce.gov.br,1521]",
+                        "delay": "10m",
+                        "interface_ref": "if1",
+                        "tags": [
+                            {
+                                "tag": "check",
+                                "value": "1521"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,cevmbd02.tre-ce.gov.br,1521])=0",
+                                "name": "cevmbd02 - 1521 off",
+                                "priority": "HIGH"
+                            },
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[http,cevmbd02.tre-ce.gov.br,1521])=1",
+                                "name": "cevmbd02 - 1521 on",
+                                "priority": "INFO"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "oracledb- 1521",
+                        "key": "net.tcp.service[tcp,172.17.0.2,1521]",
+                        "delay": "1s",
+                        "interface_ref": "if1",
+                        "tags": [
+                            {
+                                "tag": "check",
+                                "value": "1521"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[tcp,172.17.0.2,1521])=0",
+                                "name": "oracledb- 1521 off",
+                                "priority": "HIGH"
+                            },
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[tcp,172.17.0.2,1521])=1",
+                                "name": "oracledb- 1521 on",
+                                "priority": "INFO"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "cevmbd06 - 5432",
+                        "key": "net.tcp.service[tcp,cevmbd06.tre-ce.gov.br,5432]",
+                        "delay": "10m",
+                        "interface_ref": "if1",
+                        "tags": [
+                            {
+                                "tag": "check",
+                                "value": "1521"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[tcp,cevmbd06.tre-ce.gov.br,5432])=0",
+                                "name": "cevmbd06 - 5432 off",
+                                "priority": "HIGH"
+                            },
+                            {
+                                "expression": "last(/Zabbix server/net.tcp.service[tcp,cevmbd06.tre-ce.gov.br,5432])=1",
+                                "name": "cevmbd06 - 5432 on",
+                                "priority": "INFO"
+                            }
+                        ]
+                    }
+                ],
+                "httptests": [
+                    {
+                        "name": "verificar a disponibilidade do sistema sei",
+                        "delay": "60s",
+                        "status": "DISABLED",
+                        "steps": [
+                            {
+                                "name": "verificar a disponibilidade do sistema sei",
+                                "url": "https://sei.tre-ce.jus.br"
+                            }
+                        ]
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$LOG_PATH}",
+                        "value": "/var/log/tst"
+                    }
+                ],
+                "inventory_mode": "DISABLED"
+            }
+        ]
+    }
+}

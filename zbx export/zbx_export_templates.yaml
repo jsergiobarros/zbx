@@ -1,0 +1,1052 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-28T12:30:23Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+    -
+      uuid: 748ad4d098d447d492bb935c907f652f
+      name: Templates/Databases
+  templates:
+    -
+      uuid: fbfa39cb9335438591e2757873893e66
+      template: 'TRE-CE Banco oracle'
+      name: 'TRE-CE Banco oracle'
+      groups:
+        -
+          name: Templates/Databases
+      items:
+        -
+          uuid: 4e4fc048a59f4a858ca26ddd8540eec9
+          name: '6 - CPU usage 2'
+          type: ODBC
+          key: 'db.odbc.select[cpu 2,{$DSN},]'
+          delay: 60s
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+          params: 'select replace(value,'','',''.'') FROM V$sysmetric where group_id = 2 and metric_name = ''Host CPU Utilization (%)'''
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+          triggers:
+            -
+              uuid: b8f2acd7fdff48fb9cf0bbded626fb42
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[cpu 2,{$DSN},])>=95'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/TRE-CE Banco oracle/db.odbc.select[cpu 2,{$DSN},])<95'
+              name: '6 - CPU usage 2 alto'
+              priority: HIGH
+            -
+              uuid: 7c375f6fd132443ba4c79b6a1b06cead
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[cpu 2,{$DSN},])<=80'
+              name: '6 - CPU usage 2 information'
+              priority: INFO
+            -
+              uuid: 021181fd62c74e399153511f73e5cfbf
+              expression: |
+                last(/TRE-CE Banco oracle/db.odbc.select[cpu 2,{$DSN},])>80 and
+                last(/TRE-CE Banco oracle/db.odbc.select[cpu 2,{$DSN},])<95
+              name: '6 - CPU usage 2 medio'
+              priority: WARNING
+        -
+          uuid: e711b1070cd943e986fd6f4c454239e1
+          name: '6 - CPU usage 3'
+          type: ODBC
+          key: 'db.odbc.select[cpu 3,{$DSN},]'
+          delay: 60s
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+          params: 'select replace(value,'','',''.'') FROM V$sysmetric where group_id = 3 and metric_name = ''Host CPU Utilization (%)'''
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+          triggers:
+            -
+              uuid: 9613ccd318ac4afaa2060f86f1e3b305
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[cpu 3,{$DSN},])>=95'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/TRE-CE Banco oracle/db.odbc.select[cpu 3,{$DSN},])<95'
+              name: '6 - CPU usage 3 alto'
+              priority: HIGH
+            -
+              uuid: f4afb19307704a418d26d2953d2fe84f
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[cpu 3,{$DSN},])<=80'
+              name: '6 - CPU usage 3 information'
+              priority: INFO
+            -
+              uuid: 121c95fbdb99461483bc66a8957e6221
+              expression: |
+                last(/TRE-CE Banco oracle/db.odbc.select[cpu 3,{$DSN},])>80 and
+                last(/TRE-CE Banco oracle/db.odbc.select[cpu 3,{$DSN},])<95
+              name: '6 - CPU usage 3 medio'
+              priority: WARNING
+        -
+          uuid: 4f76ea01b3e4421f88e66163c601f7ec
+          name: '5 - Disponível Desde'
+          type: ODBC
+          key: 'db.odbc.select[disponivel, {$DSN}]'
+          delay: 3h
+          trends: '0'
+          value_type: TEXT
+          params: |
+            SELECT TO_CHAR(STARTUP_TIME, 'HH24:MI DD-MON-YY') "STARTUP TIME"
+            FROM V$INSTANCE;
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+        -
+          uuid: e51bde1f2ee9408a99d8862277488d26
+          name: 'Horario da maquina'
+          type: ODBC
+          key: 'db.odbc.select[horario, {$DSN}]'
+          delay: 30m
+          trends: '0'
+          value_type: TEXT
+          params: |
+            SELECT TO_CHAR
+                (SYSDATE, 'YYYY-MM-DD HH24:MI:SS') "NOW"
+                 FROM DUAL
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+          tags:
+            -
+              tag: check
+              value: '10'
+          triggers:
+            -
+              uuid: 1093803d032e4c2c9b2ea691ec844903
+              expression: 'nodata(/TRE-CE Banco oracle/db.odbc.select[horario, {$DSN}],30m)=0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'nodata(/TRE-CE Banco oracle/db.odbc.select[horario, {$DSN}],30m)=1'
+              name: 'resposta OK'
+              priority: INFO
+            -
+              uuid: d710862666ff4b0cb33b98938cef4ac4
+              expression: 'nodata(/TRE-CE Banco oracle/db.odbc.select[horario, {$DSN}],31m)=1'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'nodata(/TRE-CE Banco oracle/db.odbc.select[horario, {$DSN}],31m)=0'
+              name: 'sem resposta'
+              priority: DISASTER
+              description: 'Não foi recebida nenhuma informação do banco {$DSN}'
+            -
+              uuid: d650d118d8414698b2ca15f196b890ca
+              expression: 'nodata(/TRE-CE Banco oracle/db.odbc.select[horario, {$DSN}],1h)=1'
+              name: 'uma hora sem resposta'
+              priority: DISASTER
+              description: 'Não foi recebida nenhuma informação do banco {$DSN} nos últimos 60 minutos'
+        -
+          uuid: d6c351c755224943aecab7e596de1ed6
+          name: '2 - Instance Name'
+          type: ODBC
+          key: 'db.odbc.select[instancia,{$DSN},]'
+          delay: 24h
+          trends: '0'
+          value_type: TEXT
+          params: 'select instance_name from v$instance'
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+        -
+          uuid: f877bdffdcd64629aa8e26a53991c88d
+          name: '1 - Nome da Maquina'
+          type: ODBC
+          key: 'db.odbc.select[maquina,{$DSN},]'
+          delay: 24h
+          trends: '0'
+          value_type: TEXT
+          params: 'select host_name from v$instance'
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED
+              parameters:
+                - ''
+        -
+          uuid: eece2e3e7c3b43bf9d595f303ce24e1a
+          name: network
+          type: ODBC
+          key: 'db.odbc.select[network,{$DSN},]'
+          delay: 10m
+          status: DISABLED
+          value_type: FLOAT
+          units: 'Bytes / sec'
+          params: 'select replace(value,'','',''.'') FROM V$sysmetric where metric_name = ''Network Traffic Volume Per Sec'''
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+        -
+          uuid: c4ac9a455ef945ffbd267e0f4ffd42be
+          name: '4 - Status'
+          type: ODBC
+          key: 'db.odbc.select[status,{$DSN},]'
+          delay: 30m
+          trends: '0'
+          value_type: TEXT
+          params: 'select status from v$instance'
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+          triggers:
+            -
+              uuid: 5b2fde066f344090a8cd6dc39094b390
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[status,{$DSN},])="OPEN"'
+              name: '4 - Status'
+              priority: INFO
+            -
+              uuid: 31b0aabf35df4568ad8b44239cb47c8a
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[status,{$DSN},])="CLOSED"'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/TRE-CE Banco oracle/db.odbc.select[status,{$DSN},])="OPEN"'
+              name: '4 - Status closed'
+              priority: HIGH
+        -
+          uuid: 3f9091cd057e4f60bfbc4895cdd6c963
+          name: '7 - Tamanho de Arquivos'
+          type: ODBC
+          key: 'db.odbc.select[tamanho,{$DSN},]'
+          delay: 24h
+          value_type: FLOAT
+          units: GB
+          params: 'select replace(sum(bytes)/1024/1024/1024,'','',''.'')  from dba_data_files'
+          username: '{$ORA_USER}'
+          password: '{$ORA_PASS}'
+        -
+          uuid: 665eff3f0e5d49b98ca56347170fae5d
+          name: 'check tempo'
+          type: DEPENDENT
+          key: 'db.odbc.select[]'
+          delay: '0'
+          value_type: FLOAT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (Date.parse(Date().split(".")[0])-Date.parse(value))/1000/60/60'
+          master_item:
+            key: 'db.odbc.select[horario, {$DSN}]'
+          tags:
+            -
+              tag: check
+              value: '10'
+          triggers:
+            -
+              uuid: a3bf73a0c8a94c3fa54189764bf3cf9a
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[])>1'
+              name: 'check tempo'
+              priority: WARNING
+              description: 'horario do banco atrasado em uma hora'
+              manual_close: 'YES'
+            -
+              uuid: 2fabf0e1f9eb4121814cd9531f7b7262
+              expression: 'last(/TRE-CE Banco oracle/db.odbc.select[])<0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                last(/TRE-CE Banco oracle/db.odbc.select[])>0 and
+                last(/TRE-CE Banco oracle/db.odbc.select[])<1
+              name: 'check tempo fuso'
+              priority: WARNING
+              description: 'horario do banco em fuso diferente'
+              manual_close: 'YES'
+            -
+              uuid: db13bbc70d664b2db76433a3c967ccfd
+              expression: |
+                last(/TRE-CE Banco oracle/db.odbc.select[])<1 and 
+                last(/TRE-CE Banco oracle/db.odbc.select[])>-1
+              name: 'check tempo ok'
+              priority: INFO
+              description: 'horario do banco atrasado em uma hora'
+              manual_close: 'YES'
+        -
+          uuid: 96d7c59e09054dbaac100e2730c8fedb
+          name: Listener
+          key: 'system.run[ lsnrctl status ]'
+          trends: '0'
+          status: DISABLED
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var valor = value.split("\n")
+                  now = new Date();
+                  if (valor[6]==="STATUS of the LISTENER")
+                  return "online "+valor[10]
+                  else
+                  return "offline "+now
+      macros:
+        -
+          macro: '{$DSN}'
+          value: Banco
+        -
+          macro: '{$ORACLE.DRIVER}'
+          value: /usr/lib/oracle/21/client64/lib/libsqora.so.21.1
+        -
+          macro: '{$ORACLE.PORT}'
+          value: '1521'
+        -
+          macro: '{$ORACLE.SERVICE}'
+          value: hmg
+        -
+          macro: '{$ORA_PASS}'
+          value: xxxxxxxx
+        -
+          macro: '{$ORA_USER}'
+          value: zabbix_mon
+      dashboards:
+        -
+          uuid: 591f7125d80840b598612bbf90f1b39b
+          name: 'visão geral'
+          pages:
+            -
+              widgets:
+                -
+                  type: ITEM
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'db.odbc.select[maquina,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                -
+                  type: ITEM
+                  x: '7'
+                  'y': '2'
+                  width: '5'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'db.odbc.select[instancia,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                -
+                  type: ITEM
+                  'y': '2'
+                  width: '7'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'db.odbc.select[disponivel, {$DSN}]'
+                        host: 'TRE-CE Banco oracle'
+                -
+                  type: PLAIN_TEXT
+                  'y': '4'
+                  width: '12'
+                  height: '6'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '50'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[maquina,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[instancia,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[status,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[disponivel, {$DSN}]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[cpu 2,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[cpu 3,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[tamanho,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[horario, {$DSN}]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'system.run[ lsnrctl status ]'
+                        host: 'TRE-CE Banco oracle'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: 'db.odbc.select[network,{$DSN},]'
+                        host: 'TRE-CE Banco oracle'
+                -
+                  type: ITEM
+                  x: '12'
+                  width: '6'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'db.odbc.select[]'
+                        host: 'TRE-CE Banco oracle'
+    -
+      uuid: 8183d8cd75124fda9abfb5f4fc751810
+      template: 'TRE-CE Banco oracle Agente'
+      name: 'TRE-CE Banco oracle Agente'
+      groups:
+        -
+          name: Templates/Applications
+        -
+          name: Templates/Databases
+      items:
+        -
+          uuid: 34b48eec9f9c41caacd729247b236f27
+          name: 'admtre Log erros'
+          type: DEPENDENT
+          key: 'data.log[]'
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var dias, split, data = value.split('em ')
+                  split = data[1].split(' ')
+                  MONTHS_LIST = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                  month_index = ('0' + (MONTHS_LIST.indexOf(split[1]) + 1)).slice(-2),
+                  ISOdate = split[4] + '-' + month_index + '-' + split[2] ,
+                  now = new Date();
+                  dias = (Date.parse(now)-Date.parse(ISOdate))/(1000*60*60*24)
+                  
+                  if(split[0]==="Seg"||split[0]==="Ter" && dias>4)
+                  return "anterior  "+ISOdate 
+                  else if (dias >2)
+                  return "anterior "+ISOdate 
+                  else{
+                  if(data[0].search("interrompido")>0)
+                  return "interrompido "+ISOdate 
+                  else if (data[0].search("erro")>0)
+                  return "erro "+ISOdate 
+                  else
+                  return "sucesso "+ISOdate 
+                  }
+                  
+          master_item:
+            key: 'logrt["{$LOG_PATH}/2*","O job" ]'
+          tags:
+            -
+              tag: tag
+              value: log
+        -
+          uuid: 17edfec838f74bbb9ae75381b1075bae
+          name: '3 Quarta'
+          type: DEPENDENT
+          key: 'log.quarta[]'
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  aux=value.search("Qua")
+                  if (aux>0)
+                  return value
+                  else
+                  return null
+          master_item:
+            key: 'logrt[{$LOG_PATH}/l*,"O job" ]'
+          tags:
+            -
+              tag: tag
+              value: log
+          triggers:
+            -
+              uuid: bc27106e42a14b39bc8e689403c684f5
+              expression: '((find(/TRE-CE Banco oracle Agente/log.quarta[],,"regexp","erro"))<>0)'
+              name: 'Quarta erro'
+              priority: AVERAGE
+              type: MULTIPLE
+            -
+              uuid: 7a5e2e2d2a0f499280e9927ad2f2a62a
+              expression: '((find(/TRE-CE Banco oracle Agente/log.quarta[],,"regexp","interropido"))<>0 or (find(/TRE-CE Banco oracle Agente/log.quarta[],,"regexp","anterior"))<>0)'
+              name: 'Quarta interrompido'
+              priority: DISASTER
+              type: MULTIPLE
+            -
+              uuid: b76ec5dc9dff4529a6a51ce8dddc7a1a
+              expression: '((find(/TRE-CE Banco oracle Agente/log.quarta[],,"regexp","sucesso"))<>0)'
+              name: 'Quarta sucesso'
+              priority: INFO
+              type: MULTIPLE
+        -
+          uuid: 4aa5b96fc56e475f89559455150510be
+          name: '4 Quinta'
+          type: DEPENDENT
+          key: 'log.quinta[]'
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  aux=value.search("Qui")
+                  if (aux>0)
+                  return value
+                  else
+                  return null
+          master_item:
+            key: 'logrt[{$LOG_PATH}/l*,"O job" ]'
+          tags:
+            -
+              tag: tag
+              value: log
+          triggers:
+            -
+              uuid: 199be3f1719640ffb8c109284fbe8469
+              expression: '((find(/TRE-CE Banco oracle Agente/log.quinta[],,"regexp","erro"))<>0)'
+              name: 'Quinta erro'
+              priority: AVERAGE
+              type: MULTIPLE
+            -
+              uuid: 1f304a2abdc14077a1fc1732373d77b7
+              expression: '((find(/TRE-CE Banco oracle Agente/log.quinta[],,"regexp","interrompido"))<>0 or (find(/TRE-CE Banco oracle Agente/log.quinta[],,"regexp","anterior"))<>0)'
+              name: 'Quinta interrompido'
+              priority: DISASTER
+              type: MULTIPLE
+            -
+              uuid: 17dcd4e60dc84972ae2137f66d123440
+              expression: '((find(/TRE-CE Banco oracle Agente/log.quinta[],,"regexp","sucesso"))<>0)'
+              name: 'Quinta sucesso'
+              priority: INFO
+              type: MULTIPLE
+        -
+          uuid: 9bf483e81b67492faee61cf31e2e871e
+          name: '1 Segunda'
+          type: DEPENDENT
+          key: 'log.segunda[]'
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  aux=value.search("Seg")
+                  if (aux>0)
+                  return value
+                  else
+                  return null
+          master_item:
+            key: 'logrt[{$LOG_PATH}/l*,"O job" ]'
+          tags:
+            -
+              tag: tag
+              value: log
+          triggers:
+            -
+              uuid: dc89f74735ac44c0992c02ac9a536ec2
+              expression: '((find(/TRE-CE Banco oracle Agente/log.segunda[],,"regexp","erro"))<>0)'
+              name: 'segunda erro'
+              priority: AVERAGE
+              type: MULTIPLE
+            -
+              uuid: 80c9b07a80ea4567941d3e1ff5a1037f
+              expression: '(((find(/TRE-CE Banco oracle Agente/log.segunda[],,"regexp","interrompido"))<>0) or ((find(/TRE-CE Banco oracle Agente/log.segunda[],,"regexp","anterior"))<>0))'
+              name: 'segunda interrompido'
+              priority: DISASTER
+              description: |
+                if(split[0]==="Seg"||split[0]==="Ter" && dias>4)
+                return ISOdate+" anterior  "+ split[0]
+                else if (dias >2)
+                return ISOdate +" anterior"+ split[0]
+                else{
+                if(data[0].search("interrompido")>0)
+                return "interrompido " + split[0]
+                else if (data[0].search("erro")>0)
+                return ISOdate+" erro " + split[0]
+                else
+                return ISOdate+" sucesso "+ split[0]
+              type: MULTIPLE
+            -
+              uuid: eb7da2bece9443edb79049eb0bed950f
+              expression: '((find(/TRE-CE Banco oracle Agente/log.segunda[],,"regexp","sucesso"))<>0)'
+              name: 'segunda sucesso'
+              priority: INFO
+              type: MULTIPLE
+        -
+          uuid: b647daebae174515b8baaf59b10ff3ba
+          name: '5 Sexta'
+          type: DEPENDENT
+          key: 'log.Sexta[]'
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  aux=value.search("Sex")
+                  if (aux>0)
+                  return value
+                  else
+                  return null
+          master_item:
+            key: 'logrt[{$LOG_PATH}/l*,"O job" ]'
+          tags:
+            -
+              tag: tag
+              value: log
+          triggers:
+            -
+              uuid: 5551f7fd102b4cc2a51cdaafb978cde9
+              expression: '((find(/TRE-CE Banco oracle Agente/log.Sexta[],,"regexp","erro"))<>0)'
+              name: 'Sexta erro'
+              priority: AVERAGE
+              type: MULTIPLE
+            -
+              uuid: cca6fa7ebd164d0b99d9e40f929bbd6f
+              expression: '((find(/TRE-CE Banco oracle Agente/log.Sexta[],,"regexp","interrompido"))<>0 or (find(/TRE-CE Banco oracle Agente/log.Sexta[],,"regexp","anterior"))<>0)'
+              name: 'Sexta interrompido'
+              priority: DISASTER
+              type: MULTIPLE
+            -
+              uuid: 4f2b8b6be65140df879ee4bd8db5a0e1
+              expression: '((find(/TRE-CE Banco oracle Agente/log.Sexta[],,"regexp","sucesso"))<>0)'
+              name: 'Sexta sucesso'
+              priority: INFO
+              type: MULTIPLE
+        -
+          uuid: 5c7b2e9c23c848338011079e3b31b355
+          name: '2 Terça'
+          type: DEPENDENT
+          key: 'log.terca[]'
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  aux=value.search("Ter")
+                  if (aux>0)
+                  return value
+                  else
+                  return null
+          master_item:
+            key: 'logrt[{$LOG_PATH}/l*,"O job" ]'
+          tags:
+            -
+              tag: tag
+              value: log
+          triggers:
+            -
+              uuid: d3d6ae83dab341fea66ee775111b9de9
+              expression: '((find(/TRE-CE Banco oracle Agente/log.terca[],,"regexp","erro"))<>0)'
+              name: 'terça erro'
+              priority: AVERAGE
+              type: MULTIPLE
+            -
+              uuid: 674bb7d5d0b346329ad3e40c67455d9d
+              expression: '((find(/TRE-CE Banco oracle Agente/log.terca[],,"regexp","anterior"))<>0 or (find(/TRE-CE Banco oracle Agente/log.terca[],,"regexp","interrompido"))<>0)'
+              name: 'Terça interrompido'
+              priority: DISASTER
+              description: anterior
+              type: MULTIPLE
+            -
+              uuid: 4b7ee7b294e349c88f31581902ca35af
+              expression: '((find(/TRE-CE Banco oracle Agente/log.terca[],,"regexp","sucesso"))<>0)'
+              name: 'Terça sucesso'
+              priority: INFO
+              type: MULTIPLE
+        -
+          uuid: 73fe97501fa843158863ac5cbdbb1b87
+          name: 'log file admtre'
+          type: ZABBIX_ACTIVE
+          key: 'logrt["{$LOG_PATH}/2*","O job" ]'
+          trends: '0'
+          value_type: LOG
+          logtimefmt: 'em xxx MMM dd hh:mm:ss yyyy'
+        -
+          uuid: 7c23ee546c3b4feab1f8cfcfae8ff47d
+          name: '0 Log TRE'
+          type: ZABBIX_ACTIVE
+          key: 'logrt[{$LOG_PATH}/l*,"O job" ]'
+          delay: 6h;wd1-5h14
+          history: 365d
+          trends: '0'
+          value_type: LOG
+          logtimefmt: yyyy-MM-dd
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var dias, split, data = value.split('em ')
+                  split = data[1].split(' ')
+                  MONTHS_LIST = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                  month_index = ('0' + (MONTHS_LIST.indexOf(split[1]) + 1)).slice(-2),
+                  ISOdate = split[4] + '-' + month_index + '-' + split[2] ,
+                  now = new Date();
+                  dias = (Date.parse(now)-Date.parse(ISOdate))/(1000*60*60*24)
+                  
+                  if(split[0]==="Seg"||split[0]==="Ter" && dias>4)
+                  return ISOdate+" anterior  "+ split[0]
+                  else if (dias >2)
+                  return ISOdate +" anterior"+ split[0]
+                  else{
+                  if(data[0].search("interrompido")>0)
+                  return "interrompido " + split[0]
+                  else if (data[0].search("erro")>0)
+                  return ISOdate+" erro " + split[0]
+                  else
+                  return ISOdate+" sucesso "+ split[0]
+                  }
+                  
+          tags:
+            -
+              tag: tag
+              value: log
+        -
+          uuid: 9d2d20fa38ac4f43ac64799ee6dd7faf
+          name: 'log file rman'
+          type: ZABBIX_ACTIVE
+          key: 'log[{$RMAN_PATH},"Status: "]'
+          trends: '0'
+          value_type: TEXT
+          triggers:
+            -
+              uuid: 9edbeda4afd34a7abd0152fffb025dac
+              expression: '((find(/TRE-CE Banco oracle Agente/log[{$RMAN_PATH},"Status: "],,"regexp","AVAILABLE"))<>0)'
+              name: 'rman ok'
+              priority: INFO
+              type: MULTIPLE
+        -
+          uuid: 19f271b960bd47528dacb12b2dbadac0
+          name: 'CPU utilization'
+          type: DEPENDENT
+          key: system.cpu.util
+          delay: '0'
+          history: 7d
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+          description: 'CPU utilization in %'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //Calculate utilization
+                  return (100 - value)
+          master_item:
+            key: 'system.cpu.util[,idle]'
+          triggers:
+            -
+              uuid: 2ff1cc83e935484da281bc14c2d6ea25
+              expression: 'last(/TRE-CE Banco oracle Agente/system.cpu.util)>75 and last(/TRE-CE Banco oracle Agente/system.cpu.util)<95'
+              name: 'CPU mid'
+              priority: WARNING
+            -
+              uuid: f9bc785aaaa5464580bf8c5555ae029b
+              expression: |
+                last(/TRE-CE Banco oracle Agente/system.cpu.util)>0 and
+                last(/TRE-CE Banco oracle Agente/system.cpu.util)<75
+              name: 'CPU OK'
+              priority: INFO
+            -
+              uuid: 850d9b0182ea4534b63c57d18e472f13
+              expression: 'last(/TRE-CE Banco oracle Agente/system.cpu.util)>95'
+              name: 'CPU perigo'
+              priority: DISASTER
+        -
+          uuid: 616cddb8a6074a21908b5998d200c08c
+          name: 'CPU idle time'
+          key: 'system.cpu.util[,idle]'
+          history: 7d
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent doing nothing.'
+        -
+          uuid: 9291a4ec6506409986c05937a29654a2
+          name: 'count logFile'
+          key: 'system.run["ls {$LOG_PATH}/  | wc -l",]'
+          delay: '24h;60/1-5,12:00-12:01'
+        -
+          uuid: 0bc5da7dcff4418e9d459b8c590610ad
+          name: 'CPU available physical processors in the shared pool'
+          key: 'system.stat[cpu,app]'
+          history: 1w
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+        -
+          uuid: 006c4238a0f14c84b5a2a7c121130f41
+          name: 'CPU entitled capacity consumed'
+          key: 'system.stat[cpu,ec]'
+          history: 1w
+          status: DISABLED
+          value_type: FLOAT
+        -
+          uuid: 050270364f0243178e2f32145ea3c735
+          name: 'CPU logical processor utilization'
+          key: 'system.stat[cpu,lbusy]'
+          history: 1w
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+        -
+          uuid: c4a2c29856d2479a8c4371163393f430
+          name: 'CPU number of physical processors consumed'
+          key: 'system.stat[cpu,pc]'
+          history: 1w
+          status: DISABLED
+          value_type: FLOAT
+        -
+          uuid: 3f721be3793440c1a5d6c62c00ca11fa
+          name: 'Processor units is entitled to receive'
+          key: 'system.stat[ent]'
+          delay: 1h
+          history: 1w
+          status: DISABLED
+          value_type: FLOAT
+        -
+          uuid: ba1f7fb695aa447aa4f4ca085e450f25
+          name: 'Available memory in %'
+          key: 'vm.memory.size[pavailable]'
+          history: 7d
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+          description: 'Available memory as percentage of total. See also Appendixes in Zabbix Documentation about parameters of the vm.memory.size item.'
+        -
+          uuid: 6f3c5baab9e64d0d9fd4769ae611e101
+          name: 'Memory utilization'
+          type: DEPENDENT
+          key: vm.memory.utilization
+          delay: '0'
+          history: 7d
+          status: DISABLED
+          value_type: FLOAT
+          units: '%'
+          description: 'Memory used percentage is calculated as (100-pavailable)'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (100-value);'
+          master_item:
+            key: 'vm.memory.size[pavailable]'
+          triggers:
+            -
+              uuid: 4f5a5243677149fa8fb79a7b87317794
+              expression: |
+                last(/TRE-CE Banco oracle Agente/vm.memory.utilization)>80 and
+                last(/TRE-CE Banco oracle Agente/vm.memory.utilization)<95
+              name: 'memoria medio'
+              priority: WARNING
+            -
+              uuid: d0068b674ffe452b820f17bb3795f8cc
+              expression: 'last(/TRE-CE Banco oracle Agente/vm.memory.utilization)<80'
+              name: 'memoria OK'
+              priority: INFO
+            -
+              uuid: ae79e145449242cbb57cd45ac92a2365
+              expression: 'last(/TRE-CE Banco oracle Agente/vm.memory.utilization)>95'
+              name: 'memoria perigo'
+              priority: DISASTER
+        -
+          uuid: 23a701be2d3a425fb7b1566f186b7eae
+          name: 'Zabbix agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,agent,available]'
+          history: 7d
+          status: DISABLED
+          description: 'Monitoring agent availability status'
+          valuemap:
+            name: zabbix.host.available
+          triggers:
+            -
+              uuid: 58118ec2cbb145ef88378928366da7af
+              expression: 'max(/TRE-CE Banco oracle Agente/zabbix[host,agent,available],{$AGENT.TIMEOUT})=1'
+              name: 'Zabbix agent is available (for {$AGENT.TIMEOUT})'
+              priority: INFO
+              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              manual_close: 'YES'
+      macros:
+        -
+          macro: '{$LOG_PATH}'
+        -
+          macro: '{$ORA_PASS}'
+          value: zabbix_mon
+        -
+          macro: '{$ORA_USER}'
+        -
+          macro: '{$RMAN_PATH}'
+      dashboards:
+        -
+          uuid: 097726b4351947928d98863473573a4f
+          name: 'visão geral'
+          pages:
+            -
+              widgets:
+                -
+                  type: ITEM
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'logrt[{$LOG_PATH}/l*,"O job" ]'
+                        host: 'TRE-CE Banco oracle Agente'
+                -
+                  type: ITEM
+                  name: 'log admtre'
+                  'y': '4'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'logrt["{$LOG_PATH}/2*","O job" ]'
+                        host: 'TRE-CE Banco oracle Agente'
+                -
+                  type: ITEM
+                  name: 'log rman'
+                  'y': '2'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'log[{$RMAN_PATH},"Status: "]'
+                        host: 'TRE-CE Banco oracle Agente'
+                -
+                  type: ITEM
+                  name: Quarta
+                  x: '12'
+                  'y': '4'
+                  width: '11'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'log.quarta[]'
+                        host: 'TRE-CE Banco oracle Agente'
+                -
+                  type: ITEM
+                  name: Quinta
+                  x: '12'
+                  'y': '6'
+                  width: '11'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'log.quinta[]'
+                        host: 'TRE-CE Banco oracle Agente'
+                -
+                  type: ITEM
+                  name: Segunda
+                  x: '12'
+                  width: '11'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'log.segunda[]'
+                        host: 'TRE-CE Banco oracle Agente'
+                -
+                  type: ITEM
+                  name: Sexta
+                  x: '12'
+                  'y': '8'
+                  width: '11'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'log.Sexta[]'
+                        host: 'TRE-CE Banco oracle Agente'
+                -
+                  type: ITEM
+                  name: Terça
+                  x: '12'
+                  'y': '2'
+                  width: '11'
+                  hide_header: 'YES'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemid
+                      value:
+                        key: 'log.terca[]'
+                        host: 'TRE-CE Banco oracle Agente'
+      valuemaps:
+        -
+          uuid: 595bae16f01e4d7780d8803b1032b7f1
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown

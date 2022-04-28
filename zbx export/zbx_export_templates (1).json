@@ -1,0 +1,1545 @@
+{
+    "zabbix_export": {
+        "version": "6.0",
+        "date": "2022-04-28T12:30:39Z",
+        "groups": [
+            {
+                "uuid": "7df96b18c230490a9a0a9e2307226338",
+                "name": "Templates"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "cc5571e913644ecfbf501713461e4500",
+                "template": "template_oracle_odbc",
+                "name": "Template Oracle ODBC",
+                "description": "Template Oracle ODBC",
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "025be05d999d4dfe999ae9f724b0863a",
+                        "name": "Archivelog",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_archive, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "MB",
+                        "params": "select round(A.LOGS*B.AVG/1024/1024/10) from ( SELECT COUNT (*)  LOGS FROM V$LOG_HISTORY WHERE FIRST_TIME >= (sysdate -10/60/24)) A, ( SELECT Avg(BYTES) AVG,  Count(1), Max(BYTES) Max_Bytes, Min(BYTES) Min_Bytes  FROM  v$log) B",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "2e937b293220499ab04788a9342bd2f8",
+                                "expression": "last(/template_oracle_odbc/db.odbc.select[ora_archive, {$DSN}])>100",
+                                "name": "Archivelog {HOST.HOST}",
+                                "priority": "WARNING",
+                                "description": "HIGH Archivelog generation"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "56dac0034fed41fd8b6c2e59e3186494",
+                        "name": "Audit",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_audit, {$DSN}]",
+                        "delay": "300",
+                        "trends": "0",
+                        "status": "DISABLED",
+                        "value_type": "TEXT",
+                        "params": "select username \"username\", to_char(timestamp,'DD-MON-YYYY HH24:MI:SS') \"time_stamp\", action_name \"statement\", os_username \"os_username\", userhost \"userhost\", returncode||decode(returncode,'1004','-Wrong Connection','1005','-NULL Password','1017','-Wrong Password','1045','-Insufficient Priviledge','0','-Login Accepted','--') \"returncode\" from sys.dba_audit_session where (sysdate - timestamp)*24 < 1 and returncode <> 0 order by timestamp",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "ae3ccbb90beb432990069fb62bc96adc",
+                                "expression": "find(/template_oracle_odbc/db.odbc.select[ora_audit, {$DSN}],,\"like\",\"none\")=0",
+                                "name": "Audit on {HOST.HOST}",
+                                "priority": "HIGH"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "a3a6f14053b14b2d9ad8b418f240c8db",
+                        "name": "DB Block Gets",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_dbblockgets, {$DSN}]",
+                        "delay": "300",
+                        "params": "select to_char(sum(decode(name,'db block gets', value,0))) \"block_gets\" FROM v$sysstat",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "fe255cc997db49a99cc602cb13591003",
+                        "name": "DB Consistent Gets",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_dbconsistentgets, {$DSN}]",
+                        "delay": "300",
+                        "params": "select to_char(sum(decode(name,'consistent gets', value,0))) \"consistent_gets\" FROM v$sysstat",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "c17e340c891a4841afbe360112db1d66",
+                        "name": "DB Hit Ratio",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_dbhitratio, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "params": "select ( sum(decode(name,'consistent gets', value,0)) + sum(decode(name,'db block gets', value,0)) - sum(decode(name,'physical reads', value,0))) / (sum(decode(name,'consistent gets', value,0)) + sum(decode(name,'db block gets', value,0)) ) * 100 \"hit_ratio\" FROM v$sysstat",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "3740dfdd421246db9b8cbef26262883e",
+                        "name": "DB Physical Reads",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_dbphysicalread, {$DSN}]",
+                        "delay": "300",
+                        "params": "select sum(decode(name,'physical reads', value,0)) \"phys_reads\" FROM v$sysstat",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "8af1e4af73f9404ebaef4d881d60e9e5",
+                        "name": "DB Version",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_dbversion, {$DSN}]",
+                        "delay": "300",
+                        "trends": "0",
+                        "value_type": "TEXT",
+                        "params": "select COMP_ID||' '||COMP_NAME||' '||VERSION||' '||STATUS||' <br />' from dba_registry union SELECT ' - SERVERNAME = <b>'||UTL_INADDR.get_host_name ||'</b> - SERVERADDRESS = <b>'||UTL_INADDR.get_host_address||'</b> <br />'from dual union SELECT ' - DB_NAME = <b>'||SYS_CONTEXT ('USERENV', 'DB_NAME') ||'</b> - INSTANCE_NAME = <b>' ||SYS_CONTEXT ('USERENV', 'INSTANCE_NAME')||'</b> <br />' FROM dual",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "91ad459fe78c409ba52d6d258f5dcfdf",
+                        "name": "Hit ratio - BODY",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_hitratio_body, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select gethitratio*100 \"get_pct\" FROM v$librarycache where namespace ='BODY'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "bd3c06453e0444d98e444f6cc1d3f7cb",
+                        "name": "Hit ratio - SQLAREA",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_hitratio_sqlarea, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select gethitratio*100 \"get_pct\" FROM v$librarycache where namespace ='SQL AREA'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "f013aa57b49f47a3adc3dca1b19693dc",
+                        "name": "Hit ratio - TABLE/PROCEDURE",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_hitratio_table_proc, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select gethitratio*100 \"get_pct\" FROM v$librarycache where namespace = 'TABLE/PROCEDURE'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "03ab9893ff8940e19aa1eb4518543ad0",
+                        "name": "Hit ratio - TRIGGER",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_hitratio_trigger, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select gethitratio*100 \"get_pct\" FROM v$librarycache where namespace ='TRIGGER'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "3effb4216426463f975f97a5f93b7ef2",
+                        "name": "LI/O Block Change",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_lio_block_changes, {$DSN}]",
+                        "delay": "300",
+                        "units": "Blocks/sec",
+                        "params": "SELECT to_char(SUM(DECODE(NAME,'db block changes',VALUE,0))) FROM V$SYSSTAT WHERE NAME ='db block changes'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "ef9552bc5eaa40f580dbb512227fa821",
+                        "name": "LI/O Consinstent Read",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_lio_consistent_read, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "Blocks/sec",
+                        "params": "SELECT to_char(sum(decode(name,'consistent gets',value,0))) FROM V$SYSSTAT WHERE NAME ='consistent gets'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "9a3a702b335c40a2abd19b9528198fca",
+                        "name": "LI/O Current Read",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_lio_current_read, {$DSN}]",
+                        "delay": "300",
+                        "units": "Blocks/sec",
+                        "params": "SELECT to_char(sum(decode(name,'db block gets',value,0))) FROM V$SYSSTAT WHERE NAME ='db block gets'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b5602cbc53da4ba4933c2eba4495278c",
+                        "name": "Locks",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_locks, {$DSN}]",
+                        "delay": "300",
+                        "trends": "0",
+                        "status": "DISABLED",
+                        "value_type": "TEXT",
+                        "params": "select  sn.USERNAME ||'@'||sn.machine, '|SID->' || m.SID, '|Serial->'|| sn.SERIAL#, '|Lock Type->'||m.TYPE, decode(LMODE, 1, 'Null', 2, 'Row-S (SS)', 3, 'Row-X (SX)', 4, 'Share', 5, 'S/Row-X (SSX)', 6, 'Exclusive') lock_type, decode(REQUEST, 0, 'None', 1, 'Null', 2, 'Row-S (SS)', 3, 'Row-X (SX)', 4, 'Share', 5, 'S/Row-X (SSX)', 6, 'Exclusive') lock_requested, '|Time (Sec)->'||m.CTIME \"Time(sec)\", '|ID1->'||m.ID1, '|ID2->'||m.ID2, '|SQL Text->'||t.SQL_TEXT from \tv$session sn, v$lock m , v$sqltext t where \tt.ADDRESS =sn.SQL_ADDRESS and \tt.HASH_VALUE =sn.SQL_HASH_VALUE and \t((sn.SID =m.SID and m.REQUEST !=0) or \t(sn.SID =m.SID and m.REQUEST =0 and LMODE !=4 and (ID1, ID2) in (select s.ID1, s.ID2 from v$lock S where \tREQUEST !=0 and  s.ctime > 5 and \ts.ID1 =m.ID1 and \ts.ID2 =m.ID2))) order by sn.USERNAME, sn.SID, t.PIECE",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "85b824f3590144d58616ab6d2b9f7020",
+                                "expression": "find(/template_oracle_odbc/db.odbc.select[ora_locks, {$DSN}],,\"like\",\"none\")=0",
+                                "name": "Locks on {HOST.HOST}",
+                                "priority": "HIGH"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "866042d587e6409c91c71cabc57d189a",
+                        "name": "Max Processes",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_maxprocs, {$DSN}]",
+                        "delay": "300",
+                        "params": "select value \"maxprocs\" from v$parameter where name ='processes'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "c76a7f4600ff48fc8df55c7dbd930ef3",
+                        "name": "Max Sessions",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_maxsession, {$DSN}]",
+                        "delay": "300",
+                        "params": "select value \"maxsess\" from v$parameter where name ='sessions'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "4b08eb8972e648078d08c57756296356",
+                        "name": "Miss Latch",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_miss_latch, {$DSN}]",
+                        "delay": "300",
+                        "params": "SELECT SUM(misses) FROM V$LATCH",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b58e89120d0d41c38a89e2eed2fddeee",
+                        "name": "PGA",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pga, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "params": "select to_char(decode( unit,'bytes', value/1024/1024, value),'999999999.9') value from V$PGASTAT where name in 'total PGA inuse'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "e91d4755182f466b929277b56e85c7f2",
+                        "name": "PGA Aggregate target",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pga_aggregate_target, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "params": "select to_char(decode( unit,'bytes', value/1024/1024, value),'999999999.9') value from V$PGASTAT where name in 'aggregate PGA target parameter'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "316c13463f544a1fba976ad788747971",
+                        "name": "PHI/O Datafile Reads",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_phio_datafile_reads, {$DSN}]",
+                        "delay": "300",
+                        "units": "IO/sec",
+                        "params": "select to_char(sum(decode(name,'physical reads direct',value,0))) FROM V$SYSSTAT where name ='physical reads direct'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "5a8c4774757941f180d6e98cb3dc9aa5",
+                        "name": "PHI/O Datafile Writes",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_phio_datafile_writes, {$DSN}]",
+                        "delay": "300",
+                        "units": "IO/sec",
+                        "params": "select to_char(sum(decode(name,'physical writes direct',value,0))) FROM V$SYSSTAT where name ='physical writes direct'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "e0ed4fa1a8174705a4af09581828396a",
+                        "name": "PHI/O Redo Writes",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_phio_redo_writes, {$DSN}]",
+                        "delay": "300",
+                        "units": "IO/sec",
+                        "params": "select to_char(sum(decode(name,'redo writes',value,0))) FROM V$SYSSTAT where name ='redo writes'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "0eef1823641b4f52b9e0b219cf7c3a79",
+                        "name": "Pin hit ratio - BODY",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pinhitratio_body, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select pins/(pins+reloads)*100 \"pin_hit ratio\" FROM v$librarycache where namespace ='BODY'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "3e5dab8d11fe4ad594b37a75b6e4cf20",
+                        "name": "Pin hit ratio - SQLAREA",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pinhitratio_sqlarea, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select pins/(pins+reloads)*100 \"pin_hit ratio\" FROM v$librarycache where namespace ='SQL AREA'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "8b15bde468a64c59befdb2e399be8260",
+                        "name": "Pin hit ratio - TABLE-PROCEDURE",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pinhitratio_table-proc, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select to_char((sysdate-startup_time)*86400, 'FM99999999999999990') retvalue from v$instance",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "f24713f0e6274f60834a92b3fe2ff82b",
+                        "name": "Pin hit ratio - TRIGGER",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pinhitratio_trigger, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "%",
+                        "params": "select pins/(pins+reloads)*100 \"pin_hit ratio\" FROM v$librarycache where namespace ='TRIGGER'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "ad59915ed77c403b98c1a7e00fb11cbe",
+                        "name": "Pool dict cache",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pool_dict_cache, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,'shared pool',decode(name,'dictionary cache',(bytes)/(1024*1024),0),0)),2)) pool_dict_cache FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b1b14da4e41643248d04076596b8d260",
+                        "name": "Pool free mem",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pool_free_mem, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,'shared pool',decode(name,'free memory',(bytes)/(1024*1024),0),0)),2)) pool_free_mem FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "2dafe295db524ab188b973c3ec32a7ba",
+                        "name": "Pool lib cache",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pool_lib_cache, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,'shared pool',decode(name,'library cache',(bytes)/(1024*1024),0),0)),2)) pool_lib_cache FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "04b2d038611c404eba7185f33f05df1f",
+                        "name": "Pool misc",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pool_misc, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,'shared pool',decode(name,'library cache',0,'dictionary cache',0,'free memory',0,'sql area', 0,(bytes)/(1024*1024)),0)),2)) pool_misc FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "3f931a08ff3a412fa408c21655fe4922",
+                        "name": "Pool sql area",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_pool_sql_area, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,'shared pool',decode(name,'sql area',(bytes)/(1024*1024),0),0)),2)) pool_sql_area FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "4ac9e33686b8480691becbb6aed28f21",
+                        "name": "Processes",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_procnum, {$DSN}]",
+                        "delay": "300",
+                        "params": "select count(*) \"procnum\" from v$process",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "ce7c47af4265427aa956a39ccb8d22de",
+                        "name": "Sessions",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_session, {$DSN}]",
+                        "delay": "300",
+                        "params": "select count(*) from v$session",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "d5b4ee04bd884a6dae1fb54f8239d404",
+                        "name": "Session Active",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_session_active, {$DSN}]",
+                        "delay": "300",
+                        "params": "select count(*) from v$session where TYPE!='BACKGROUND' and status='ACTIVE'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "9004a9de768d4b0a88311f6082cd04f9",
+                                "expression": "last(/template_oracle_odbc/db.odbc.select[ora_session_active, {$DSN}])>10",
+                                "name": "Active Session {HOST.HOST}",
+                                "priority": "HIGH",
+                                "description": "DANGER"
+                            },
+                            {
+                                "uuid": "0e93b75a9b074234b28580969a57ad2b",
+                                "expression": "last(/template_oracle_odbc/db.odbc.select[ora_session_active, {$DSN}])>20",
+                                "name": "Active Session {HOST.HOST}",
+                                "priority": "HIGH",
+                                "description": "DANGER"
+                            },
+                            {
+                                "uuid": "f2289473b0b14c0b9b05b633ba9c9afe",
+                                "expression": "last(/template_oracle_odbc/db.odbc.select[ora_session_active, {$DSN}])>120",
+                                "name": "Active Session {HOST.HOST}",
+                                "priority": "HIGH",
+                                "description": "DANGER"
+                            },
+                            {
+                                "uuid": "b042fac9d94a4b3fb93166fdb77e877e",
+                                "expression": "last(/template_oracle_odbc/db.odbc.select[ora_session_active, {$DSN}])>200",
+                                "name": "Active Session {HOST.HOST}",
+                                "priority": "HIGH",
+                                "description": "DANGER"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "ec738374b6cf412790ee0aa36e1b3b2d",
+                        "name": "Session Inactive",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_session_inactive, {$DSN}]",
+                        "delay": "300",
+                        "params": "select SUM(Decode(Type, 'BACKGROUND', 0, Decode(Status, 'ACTIVE', 0, 1))) FROM V$SESSION",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "1feea7e997dc4a38aa9957cc38f45ac4",
+                        "name": "Session System",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_session_system, {$DSN}]",
+                        "delay": "300",
+                        "params": "select SUM(Decode(Type, 'BACKGROUND', 1, 0)) system_sessions FROM V$SESSION",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "1c1df38ada984b1c97afd2ebfed88628",
+                        "name": "SGA buffer cache",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_sga_buffer_cache, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT to_char(ROUND(SUM(decode(pool,NULL,decode(name,'db_block_buffers',(bytes)/(1024*1024),'buffer_cache',(bytes)/(1024*1024),0),0)),2)) sga_bufcache FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "96b929be15374432a5b93dcb4dee0d5e",
+                        "name": "SGA fixed",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_sga_fixed, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,NULL,decode(name,'fixed_sga',(bytes)/(1024*1024),0),0)),2)) sga_fixed FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "392138df69e1493e9d36f87878497b90",
+                        "name": "SGA java pool",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_sga_java_pool, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT to_char(ROUND(SUM(decode(pool,'java pool',(bytes)/(1024*1024),0)),2)) sga_jpool FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "850a3fb91efb4c3995db56d63e3b30b9",
+                        "name": "SGA large pool",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_sga_large_pool, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT to_char(ROUND(SUM(decode(pool,'large pool',(bytes)/(1024*1024),0)),2)) sga_lpool FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "f791603eee3146b68fd032e992830774",
+                        "name": "SGA log buffer",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_sga_log_buffer, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,NULL,decode(name,'log_buffer',(bytes)/(1024*1024),0),0)),2)) sga_lbuffer FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "414c500cce4b402394a02f1c731865a8",
+                        "name": "SGA shared pool",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_sga_shared_pool, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "units": "M",
+                        "params": "SELECT TO_CHAR(ROUND(SUM(decode(pool,'shared pool',decode(name,'library cache',0,'dictionary cache',0,'free memory',0,'sql area',0,(bytes)/(1024*1024)),0)),2)) pool_misc FROM V$SGASTAT",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "d0722f7f56e24ad5b5f25b771ef27300",
+                        "name": "Sql Query Not Indexed",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_sqlnotindexed, {$DSN}]",
+                        "delay": "300",
+                        "value_type": "FLOAT",
+                        "params": "SELECT SUM(DECODE(NAME, 'table scans (long tables)', VALUE, 0))/ (SUM(DECODE(NAME, 'table scans (long tables)', VALUE, 0))+SUM(DECODE(NAME, 'table scans (short tables)', VALUE, 0)))*100 SQL_NOT_INDEXED FROM V$SYSSTAT WHERE 1=1 AND ( NAME IN ('table scans (long tables)','table scans (short tables)') )",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "6d4da8bbecb64462b1b35d9324c772a8",
+                        "name": "Tablespaces",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_tbl_space, {$DSN}]",
+                        "delay": "300",
+                        "trends": "0",
+                        "status": "DISABLED",
+                        "value_type": "TEXT",
+                        "params": "SELECT * FROM ( select '- Tablespace ->',t.tablespace_name ktablespace, '- Type->',substr(t.contents, 1, 1) tipo, '- Used(MB)->',trunc((d.tbs_size-nvl(s.free_space, 0))/1024/1024) ktbs_em_uso, '- ActualSize(MB)->',trunc(d.tbs_size/1024/1024) ktbs_size, '- MaxSize(MB)->',trunc(d.tbs_maxsize/1024/1024) ktbs_maxsize, '- FreeSpace(MB)->',trunc(nvl(s.free_space, 0)/1024/1024) kfree_space, '- Space->',trunc((d.tbs_maxsize - d.tbs_size + nvl(s.free_space, 0))/1024/1024) kspace, '- Perc->',decode(d.tbs_maxsize, 0, 0, trunc((d.tbs_size-nvl(s.free_space, 0))*100/d.tbs_maxsize)) kperc from ( select SUM(bytes) tbs_size, SUM(decode(sign(maxbytes - bytes), -1, bytes, maxbytes)) tbs_maxsize, tablespace_name tablespace from ( select nvl(bytes, 0) bytes, nvl(maxbytes, 0) maxbytes, tablespace_name from dba_data_files union all select nvl(bytes, 0) bytes, nvl(maxbytes, 0) maxbytes, tablespace_name from dba_temp_files ) group by tablespace_name ) d, ( select SUM(bytes) free_space, tablespace_name tablespace from dba_free_space group by tablespace_name ) s, dba_tablespaces t where t.tablespace_name = d.tablespace(+) and t.tablespace_name = s.tablespace(+) order by 8) where kperc > 98 and tipo <>'T' and tipo <>'U'",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "cbe3652967a54af0b0553b4dd13c2beb",
+                                "expression": "find(/template_oracle_odbc/db.odbc.select[ora_tbl_space, {$DSN}],,\"like\",\"none\")=0",
+                                "name": "Tablespaces on {HOST.HOST}",
+                                "priority": "HIGH"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "452d0e0e0dfb4312b817c77d159992eb",
+                        "name": "Uptime",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_uptime, {$DSN}]",
+                        "delay": "300",
+                        "params": "select to_char((sysdate-startup_time)*86400, 'FM99999999999999990') retvalue from v$instance",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "c2ea89313d344339af6f02a96b621d16",
+                                "expression": "last(/template_oracle_odbc/db.odbc.select[ora_uptime, {$DSN}])<1",
+                                "name": "Uptime on {HOST.HOST}",
+                                "priority": "HIGH"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "41ef8ff942c04fa8944cbbff776dd122",
+                        "name": "Users Connected",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_userconn, {$DSN}]",
+                        "delay": "300",
+                        "params": "select count(username) from v$session where username is not null",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "af27dbb9b4e94183952cd72db9157c88",
+                        "name": "Users Locked",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_users_locked, {$DSN}]",
+                        "delay": "300",
+                        "trends": "0",
+                        "value_type": "TEXT",
+                        "params": "SELECT username || ' ' || lock_date || ' ' || account_status as res\n  FROM dba_users\n where ACCOUNT_STATUS like 'EXPIRED(GRACE)'\n    or ACCOUNT_STATUS like 'LOCKED(TIMED)'\nunion\nselect 'none'\nfrom dual where not exists \n(\nSELECT username\n  FROM dba_users\n where ACCOUNT_STATUS like 'EXPIRED(GRACE)'\n    or ACCOUNT_STATUS like 'LOCKED(TIMED)'\n)",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "922f90246fb74581afdc5b3a644d66c4",
+                                "expression": "find(/template_oracle_odbc/db.odbc.select[ora_users_locked, {$DSN}],,\"like\",\"none\")=0",
+                                "name": "User Locked on {HOST.HOST}",
+                                "priority": "HIGH"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "adc4e744b4fa4cda8747b144b6684c42",
+                        "name": "Waits Controlfile I/O",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_controfileio, {$DSN}]",
+                        "delay": "300",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'control file sequential read', total_waits, 'control file single write', total_waits, 'control file parallel write',total_waits,0))) ControlFileIO FROM V$system_event WHERE 1=1 AND event not in ( 'SQL*Net message from client', 'SQL*Net more data from client','pmon timer', 'rdbms ipc message', 'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "6acaf6de103a4f19bb86487f63cb521e",
+                        "name": "Waits direct path read",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_directpath_read, {$DSN}]",
+                        "delay": "300",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'direct path read',total_waits,0))) DirectPathRead FROM V$system_event WHERE 1=1 AND event not in (   'SQL*Net message from ', 'SQL*Net more data from client','pmon timer', 'rdbms ipc message', 'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "04b371a94329412ebf05f70d820fb0f5",
+                        "name": "Waits File I/O",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_file_io, {$DSN}]",
+                        "delay": "30",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'file identify',total_waits, 'file open',total_waits,0))) FileIO FROM V$system_event WHERE 1=1 AND event not in (   'SQL*Net message from client',   'SQL*Net more data from client', 'pmon timer', 'rdbms ipc message', 'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "62f0d73cfc464b2e83de5894cb4fec60",
+                        "name": "Waits latch",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_latch, {$DSN}]",
+                        "delay": "30",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'control file sequential read', total_waits, 'control file single write', total_waits, 'control file parallel write',total_waits,0))) ControlFileIO FROM V$system_event WHERE 1=1 AND event not in ( 'SQL*Net message from client', 'SQL*Net more data from client', 'pmon timer', 'rdbms ipc message', 'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "e3902648055a40da84eeedc97caa57e2",
+                        "name": "Waits Logwrite",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_logwrite, {$DSN}]",
+                        "delay": "30",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'log file single write',total_waits, 'log file parallel write',total_waits,0))) LogWrite FROM V$system_event WHERE 1=1 AND event not in ( 'SQL*Net message from client', 'SQL*Net more data from client', 'pmon timer', 'rdbms ipc message', 'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "937c1c19caaa465e8528e576a539aab8",
+                        "name": "Waits multiblock read",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_multiblock_read, {$DSN}]",
+                        "delay": "30",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'db file scattered read',total_waits,0))) MultiBlockRead FROM V$system_event WHERE 1=1 AND event not in ( 'SQL*Net message from client', 'SQL*Net more data from client', 'pmon timer', 'rdbms ipc message', 'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "6476c3141f1a4c1bb2ba97ba9c6054b8",
+                        "name": "Waits others",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_other, {$DSN}]",
+                        "delay": "30",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'control file sequential read',0,'control file single write',0,'control file parallel write',0,'db file sequential read',0,'db file scattered read',0,'direct path read',0,'file identify',0,'file open',0,'SQL*Net message to client',0,'SQL*Net message to dblink',0, 'SQL*Net more data to client',0,'SQL*Net more data to dblink',0, 'SQL*Net break/reset to client',0,'SQL*Net break/reset to dblink',0, 'log file single write',0,'log file parallel write',0,total_waits))) Other FROM V$system_event WHERE 1=1 AND event not in (  'SQL*Net message from client', 'SQL*Net more data from client', 'pmon timer', 'rdbms ipc message',  'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "5b126ee057ce435ba8e883dce2d970fd",
+                        "name": "Waits single block read",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_singleblock_read, {$DSN}]",
+                        "delay": "30",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'db file sequential read',total_waits,0))) SingleBlockRead FROM V$system_event WHERE 1=1 AND event not in ( 'SQL*Net message from client', 'SQL*Net more data from client', 'pmon timer', 'rdbms ipc message', 'rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "66bcb59ba66f43e79fa7179beb56c8db",
+                        "name": "Waits SQLNet",
+                        "type": "ODBC",
+                        "key": "db.odbc.select[ora_waits_sqlnet, {$DSN}]",
+                        "delay": "30",
+                        "units": "ms waits/s",
+                        "params": "SELECT to_char(sum(decode(event,'SQL*Net message to client',total_waits,'SQL*Net message to dblink',total_waits,'SQL*Net more data to client',total_waits,'SQL*Net more data to dblink',total_waits,'SQL*Net break/reset to client',total_waits,'SQL*Net break/reset to dblink',total_waits,0))) SQLNET FROM V$system_event WHERE 1=1 AND event not in ( 'SQL*Net message from client','SQL*Net more data from client','pmon timer','rdbms ipc message','rdbms ipc reply', 'smon timer')",
+                        "username": "{$ORA_USER}",
+                        "password": "{$ORA_PASS}",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Oracle"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "triggers": [
+            {
+                "uuid": "1f41922fadfe44a194c669b2baa2270d",
+                "expression": "avg(/template_oracle_odbc/db.odbc.select[ora_hitratio_table_proc, {$DSN}],60s)<50 or avg(/template_oracle_odbc/db.odbc.select[ora_hitratio_trigger, {$DSN}],60s)<50 or avg(/template_oracle_odbc/db.odbc.select[ora_hitratio_sqlarea, {$DSN}],60s)<50 or avg(/template_oracle_odbc/db.odbc.select[ora_hitratio_body, {$DSN}],60s)<50",
+                "name": "Hit Ratio on {HOST.HOST}",
+                "priority": "HIGH"
+            },
+            {
+                "uuid": "3d8870cb66914181953eaf134f3b230e",
+                "expression": "(last(/template_oracle_odbc/db.odbc.select[ora_pga, {$DSN}])*100/last(/template_oracle_odbc/db.odbc.select[ora_pga_aggregate_target, {$DSN}]))>90",
+                "name": "PGA Alarm on {HOST.HOST}",
+                "priority": "HIGH"
+            },
+            {
+                "uuid": "e4d8a9fc9cc046f9a7f94c33c41457f2",
+                "expression": "(last(/template_oracle_odbc/db.odbc.select[ora_procnum, {$DSN}])*100/last(/template_oracle_odbc/db.odbc.select[ora_maxprocs, {$DSN}]))>80",
+                "name": "Process Alarm on {HOST.HOST}",
+                "priority": "HIGH"
+            },
+            {
+                "uuid": "a0cab6dfd14e4a8eaa3f5842973a0faa",
+                "expression": "(last(/template_oracle_odbc/db.odbc.select[ora_session, {$DSN}])*100/last(/template_oracle_odbc/db.odbc.select[ora_maxsession, {$DSN}]))>80",
+                "name": "Session Alarm on {HOST.HOST}",
+                "priority": "HIGH"
+            },
+            {
+                "uuid": "b8dbdc7da88e48579019c548ca86e9c5",
+                "expression": "(last(/template_oracle_odbc/db.odbc.select[ora_session, {$DSN}])*100/last(/template_oracle_odbc/db.odbc.select[ora_maxsession, {$DSN}]))>100",
+                "name": "Session Alarm on {HOST.HOST}",
+                "priority": "HIGH"
+            }
+        ],
+        "graphs": [
+            {
+                "uuid": "b6bdb201499b4ed4926ecb6180a874a3",
+                "name": "Archivelog",
+                "show_triggers": "NO",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "00C800",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_archive, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "5b36ec00ae654078af8500da498311de",
+                "name": "Events Waits",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "type": "STACKED",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "CCFFCC",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_latch, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "CCCCFF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_file_io, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "FF3333",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_other, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "FF33FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_singleblock_read, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "4",
+                        "color": "FFFF33",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_multiblock_read, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "5",
+                        "color": "009900",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_directpath_read, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "6",
+                        "color": "888888",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_sqlnet, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "7",
+                        "color": "00BBBB",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_controfileio, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "8",
+                        "color": "FFCCCC",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_waits_logwrite, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "eaefff020c1c444d8e36e2903f37339e",
+                "name": "Hit Ratio",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "ymin_type_1": "FIXED",
+                "ymax_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "009900",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_hitratio_table_proc, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "FFFF33",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_hitratio_body, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "FFCCFF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_hitratio_sqlarea, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "3333FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_hitratio_trigger, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "47122a496bbc4afd94c2139343a8f98c",
+                "name": "Logical I/O",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "type": "STACKED",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "3333FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_lio_consistent_read, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "00EEEE",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_lio_block_changes, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "FF9999",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_lio_current_read, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "e66af34006f041c68d1ee47783a82af9",
+                "name": "PGA",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "00CC00",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pga, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "4548d17345d140e0b7077d94ea0bbbb4",
+                "name": "Physical I/O",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "3333FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_phio_redo_writes, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "33FFFF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_phio_datafile_reads, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "FF9999",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_phio_datafile_writes, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "a2a3eb2f14d2401698508a845ddb7327",
+                "name": "Pin Hit Ratio",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "ymin_type_1": "FIXED",
+                "ymax_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "0000CC",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pinhitratio_table-proc, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "CCCC00",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pinhitratio_body, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "C800C8",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pinhitratio_sqlarea, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "00DD00",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pinhitratio_trigger, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "0656030f5aca4b07bf77e7300cf9a530",
+                "name": "Session/Process",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "0000DD",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_session, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "00CC00",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_procnum, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "7c9e74254d8e4f2c88c205a92d0ab0c4",
+                "name": "Sessions",
+                "type": "STACKED",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "3333FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_session_inactive, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "FF33FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_session_system, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "00BB00",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_session_active, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "72a608a866d84019a284e8c7d54bce44",
+                "name": "SGA Memory Usage",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "type": "STACKED",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "00BB00",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_sga_buffer_cache, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "EE0000",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_sga_fixed, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "00DDDD",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_sga_java_pool, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "FF66FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_sga_large_pool, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "4",
+                        "color": "C8C800",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_sga_log_buffer, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "5",
+                        "color": "3333FF",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_sga_shared_pool, {$DSN}]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "0d7cd2fb886d4b56aef16d19031f1269",
+                "name": "Shared Pool",
+                "show_work_period": "NO",
+                "show_triggers": "NO",
+                "type": "STACKED",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "color": "00C800",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pool_dict_cache, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "1",
+                        "color": "C80000",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pool_free_mem, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "2",
+                        "color": "008888",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pool_lib_cache, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "3",
+                        "color": "C800C8",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pool_misc, {$DSN}]"
+                        }
+                    },
+                    {
+                        "sortorder": "4",
+                        "color": "EEEE00",
+                        "item": {
+                            "host": "template_oracle_odbc",
+                            "key": "db.odbc.select[ora_pool_sql_area, {$DSN}]"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
